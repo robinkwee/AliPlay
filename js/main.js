@@ -28,6 +28,8 @@
     titleEl.textContent = game.title;
     show(gameScreen);
     stage.innerHTML = "";
+    // Immersive games fill the whole area below the top bar, edge to edge.
+    stage.classList.toggle("stage--full", !!game.immersive);
     game.mount(stage);
     Sound.tap();
   }

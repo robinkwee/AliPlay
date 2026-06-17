@@ -9,7 +9,7 @@
   const EMOJIS = ["🚒", "🐶", "🐕", "⭐", "🐾", "🐩", "🎈", "🍎"];
   const SCALE = [330, 392, 440, 494, 587]; // pentatonic — always pleasant
 
-  let field, truck, tapCount, lastSpeak, timers, onKey;
+  let field, truck, hint, tapCount, lastSpeak, timers, onKey;
 
   function rand(a) { return a[(Math.random() * a.length) | 0]; }
 
@@ -52,6 +52,7 @@
   }
 
   function onTap() {
+    if (hint) { hint.classList.add("hud--gone"); hint = null; }
     tapCount++;
     if (tapCount % 7 === 0) play("🚒", true);
     else play(String.fromCharCode(65 + ((Math.random() * 26) | 0)), false);
@@ -60,17 +61,19 @@
   window.Games = window.Games || {};
   window.Games.letters = {
     title: "Letters",
+    immersive: true,
     mount(stage) {
       tapCount = 0;
       lastSpeak = 0;
       timers = [];
       stage.innerHTML =
-        '<p class="prompt">Tap to make letters! 🚒</p>' +
         '<div class="letter-field" id="letter-field">' +
+        '  <div class="hud hud--hint" id="letter-hint">Tap to make letters! 🚒</div>' +
         '  <div class="letter-truck" id="letter-truck" aria-hidden="true">🚒</div>' +
         "</div>";
       field = document.getElementById("letter-field");
       truck = document.getElementById("letter-truck");
+      hint = document.getElementById("letter-hint");
 
       field.addEventListener("pointerdown", (e) => { e.preventDefault(); onTap(); });
 

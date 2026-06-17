@@ -62,9 +62,9 @@
 
     score++;
     scoreEl.textContent = "🐶 " + score;
-    scoreEl.classList.remove("bounce");
+    scoreEl.classList.remove("hud-pop");
     void scoreEl.offsetWidth;
-    scoreEl.classList.add("bounce");
+    scoreEl.classList.add("hud-pop");
     if (score % 5 === 0) Sound.praise("");  // an occasional spoken cheer
 
     later(spawnFire, 500 + Math.random() * 500);
@@ -73,13 +73,14 @@
   window.Games = window.Games || {};
   window.Games.rescue = {
     title: "Rescue",
+    immersive: true,
     mount(stage) {
       score = 0;
       timers = [];
       alive = true;
       stage.innerHTML =
-        '<p class="prompt" id="rescue-score">🐶 0</p>' +
         '<div class="rescue-scene" id="rescue-scene">' +
+        '  <div class="hud" id="rescue-score">🐶 0</div>' +
         '  <button class="rescue-truck" id="rescue-truck" aria-label="firetruck">🚒</button>' +
         "</div>";
       scene = document.getElementById("rescue-scene");
