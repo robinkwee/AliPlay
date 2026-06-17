@@ -112,22 +112,15 @@ h1, h2, .logo__word, .card__label {
   margin: 6px 0 0;
 }
 
-/* Very short / landscape phones: reclaim header space for the cards. */
-@media (max-height: 460px) {
-  .home__greeting { display: none; }
-  .home__header { padding-top: 8px; }
-  .chip { min-height: 46px; padding: 8px 18px; }
-}
-
 .grid {
   flex: 1 1 auto;
   min-height: 0;
   display: grid;
   grid-template-columns: repeat(2, 1fr);
-  grid-template-rows: repeat(3, minmax(0, 1fr));
-  gap: clamp(12px, 2.4vh, 24px);
+  grid-template-rows: repeat(4, minmax(0, 1fr));
+  gap: clamp(10px, 2vh, 22px);
   width: min(760px, 100%);
-  max-height: 680px;
+  max-height: 920px;
   margin: 0 auto;
   padding: clamp(14px, 2.6vh, 32px);
 }
@@ -300,6 +293,24 @@ h1, h2, .logo__word, .card__label {
   width: 14px; height: 14px;
   border-radius: 4px;
   will-change: transform, opacity;
+}
+
+/* Very short / landscape phones: reclaim header space and lay the eight
+   cards out as a wide 4×2 grid so icon + label always fit. Placed after the
+   base .grid rule so it wins (media queries add no specificity). */
+@media (max-height: 520px) {
+  .home__greeting { display: none; }
+  .home__header { padding-top: 8px; padding-bottom: 0; }
+  .chip { min-height: 46px; padding: 8px 18px; }
+  .grid {
+    grid-template-columns: repeat(4, 1fr);
+    grid-template-rows: repeat(2, minmax(0, 1fr));
+    max-height: none;
+    width: min(960px, 100%);
+  }
+  .card { gap: 2px; }
+  .card__icon { font-size: clamp(26px, 7vh, 52px); }
+  .card__label { font-size: clamp(14px, 3vh, 22px); }
 }
 
 /* ---------- Reduced motion ---------- */
