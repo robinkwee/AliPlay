@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <meta name="theme-color" content="#FDFBF7" />
+  <title>AliPlay · Gentle games for little hands</title>
+  <meta name="description" content="A calm, cozy collection of games for toddlers. Big buttons, soft colors, happy sounds." />
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet" />
+
+  <link rel="stylesheet" href="css/styles.css" />
+  <link rel="stylesheet" href="css/games.css" />
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%8E%88%3C/text%3E%3C/svg%3E" />
+</head>
+<body>
+  <!-- soft canvas texture -->
+  <div class="grain" aria-hidden="true"></div>
+
+  <!-- ========================= HOME ========================= -->
+  <main id="home" class="screen screen--active" aria-label="Choose a game">
+    <header class="home__header">
+      <div class="logo">
+        <span class="logo__mark" aria-hidden="true">🎈</span>
+        <span class="logo__word">AliPlay</span>
+      </div>
+      <p class="home__greeting">Hi Ali! What shall we play?</p>
+    </header>
+
+    <nav class="grid" aria-label="Games">
+      <button class="card card--sun" data-game="pop">
+        <span class="card__icon" aria-hidden="true">🫧</span>
+        <span class="card__label">Pop!</span>
+      </button>
+      <button class="card card--sage" data-game="animals">
+        <span class="card__icon" aria-hidden="true">🐮</span>
+        <span class="card__label">Animals</span>
+      </button>
+      <button class="card card--rust" data-game="colors">
+        <span class="card__icon" aria-hidden="true">🎨</span>
+        <span class="card__label">Colors</span>
+      </button>
+      <button class="card card--clay" data-game="shapes">
+        <span class="card__icon" aria-hidden="true">🔺</span>
+        <span class="card__label">Shapes</span>
+      </button>
+      <button class="card card--sun" data-game="counting">
+        <span class="card__icon" aria-hidden="true">🍎</span>
+        <span class="card__label">Counting</span>
+      </button>
+      <button class="card card--sage" data-game="music">
+        <span class="card__icon" aria-hidden="true">🎹</span>
+        <span class="card__label">Music</span>
+      </button>
+    </nav>
+
+    <footer class="home__footer">
+      <button id="sound-toggle" class="chip" aria-pressed="true">
+        <span class="chip__icon" aria-hidden="true">🔊</span>
+        <span class="chip__text">Sound on</span>
+      </button>
+    </footer>
+  </main>
+
+  <!-- ========================= GAME STAGE ========================= -->
+  <section id="game" class="screen" aria-label="Game" hidden>
+    <div class="topbar">
+      <button id="back-btn" class="round-btn" aria-label="Back to games">
+        <span aria-hidden="true">←</span>
+      </button>
+      <h1 id="game-title" class="topbar__title">Game</h1>
+      <div class="round-btn round-btn--ghost" aria-hidden="true"></div>
+    </div>
+    <div id="stage" class="stage"></div>
+  </section>
+
+  <!-- Confetti / sparkle layer (shared) -->
+  <div id="fx" class="fx" aria-hidden="true"></div>
+
+  <script src="js/audio.js"></script>
+  <script src="js/fx.js"></script>
+  <script src="js/games/pop.js"></script>
+  <script src="js/games/animals.js"></script>
+  <script src="js/games/colors.js"></script>
+  <script src="js/games/shapes.js"></script>
+  <script src="js/games/counting.js"></script>
+  <script src="js/games/music.js"></script>
+  <script src="js/main.js"></script>
+</body>
+</html>

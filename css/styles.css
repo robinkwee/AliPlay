@@ -1,0 +1,311 @@
+/* =========================================================
+   AliPlay — "Minimalist Play" design system
+   Warm earthy minimalist meets playful accent.
+   ========================================================= */
+
+:root {
+  /* Palette */
+  --cream:      #FDFBF7;  /* primary background  */
+  --sand:       #F3EDE2;  /* cards / containers  */
+  --sand-deep:  #E9E0D0;  /* borders / wells     */
+  --walnut:     #3A3530;  /* text & core shapes  */
+  --walnut-soft:#6B6259;  /* secondary text      */
+
+  --sun:        #E5A93C;  /* action accent 1     */
+  --sage:       #7FA185;  /* action accent 2     */
+  --rust:       #D06A4C;  /* action accent 3     */
+  --clay:       #C98B6B;  /* warm support tone   */
+
+  /* Derived tints for surfaces */
+  --sun-soft:   #F7E6C4;
+  --sage-soft:  #DCE7DC;
+  --rust-soft:  #F1D6CC;
+  --clay-soft:  #EBD9CC;
+
+  /* Form language */
+  --r-lg: 36px;
+  --r-md: 28px;
+  --r-sm: 20px;
+  --r-pill: 999px;
+
+  /* Block shadow — a solid token edge, no blur (wooden-toy feel) */
+  --edge: 6px;
+  --shadow-walnut: 0 var(--edge) 0 var(--walnut);
+  --shadow-soft:   0 var(--edge) 0 var(--sand-deep);
+
+  --tap: 76px; /* minimum tap target */
+
+  --ease-squish: cubic-bezier(.34, 1.56, .64, 1);
+}
+
+* { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+html, body {
+  margin: 0;
+  height: 100%;
+  background: var(--cream);
+  color: var(--walnut);
+  font-family: "Nunito", system-ui, sans-serif;
+  letter-spacing: .01em;
+  overscroll-behavior: none;
+  -webkit-user-select: none;
+  user-select: none;
+  touch-action: manipulation;
+}
+
+/* Everything lives within one screenful — no scrolling, ever. */
+body {
+  position: fixed;
+  inset: 0;
+  height: 100dvh;
+  overflow: hidden;
+}
+
+h1, h2, .logo__word, .card__label {
+  font-family: "Fredoka", "Nunito", sans-serif;
+  letter-spacing: .02em;
+}
+
+/* Faint organic canvas texture overlaid on the cream */
+.grain {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  opacity: .5;
+  background-image: radial-gradient(var(--sand-deep) .5px, transparent .5px);
+  background-size: 7px 7px;
+  mix-blend-mode: multiply;
+}
+
+/* ---------- Screens ---------- */
+.screen {
+  position: relative;
+  z-index: 1;
+  height: 100dvh;
+  min-height: 0;
+  overflow: hidden;
+  display: none;
+  flex-direction: column;
+}
+.screen--active { display: flex; }
+
+/* ---------- Home ---------- */
+.home__header {
+  text-align: center;
+  padding: clamp(12px, 3.5vh, 40px) 24px 4px;
+  flex: 0 0 auto;
+}
+.logo {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  font-size: clamp(28px, 5.4vh, 52px);
+}
+.logo__mark { filter: drop-shadow(0 4px 0 rgba(58,53,48,.12)); }
+.logo__word { font-weight: 700; color: var(--walnut); }
+
+.home__greeting {
+  font-size: clamp(15px, 2.8vh, 24px);
+  font-weight: 700;
+  color: var(--walnut-soft);
+  margin: 6px 0 0;
+}
+
+/* Very short / landscape phones: reclaim header space for the cards. */
+@media (max-height: 460px) {
+  .home__greeting { display: none; }
+  .home__header { padding-top: 8px; }
+  .chip { min-height: 46px; padding: 8px 18px; }
+}
+
+.grid {
+  flex: 1 1 auto;
+  min-height: 0;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  grid-template-rows: repeat(3, minmax(0, 1fr));
+  gap: clamp(12px, 2.4vh, 24px);
+  width: min(760px, 100%);
+  max-height: 680px;
+  margin: 0 auto;
+  padding: clamp(14px, 2.6vh, 32px);
+}
+
+.card {
+  appearance: none;
+  border: none;
+  cursor: pointer;
+  font: inherit;
+  color: var(--walnut);
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: clamp(4px, 1vh, 10px);
+  min-height: 0;
+  overflow: hidden;
+  padding: clamp(10px, 2vh, 20px);
+
+  background: var(--sand);
+  border-radius: var(--r-lg);
+  box-shadow: var(--shadow-walnut);
+
+  transition: transform .12s var(--ease-squish), box-shadow .12s ease;
+}
+.card__icon { font-size: clamp(38px, 8vh, 64px); line-height: 1; }
+.card__label { font-size: clamp(18px, 3.4vh, 26px); font-weight: 600; }
+
+.card--sun  { background: var(--sun-soft);  }
+.card--sage { background: var(--sage-soft); }
+.card--rust { background: var(--rust-soft); }
+.card--clay { background: var(--clay-soft); }
+
+/* Squishy press — feels like pushing a physical token down */
+.card:active {
+  transform: translateY(var(--edge));
+  box-shadow: 0 0 0 var(--walnut);
+}
+@media (hover: hover) {
+  .card:hover { transform: translateY(-3px); }
+  .card:active { transform: translateY(var(--edge)); }
+}
+
+.home__footer {
+  flex: 0 0 auto;
+  display: flex;
+  justify-content: center;
+  padding: 4px 24px clamp(12px, 3vh, 36px);
+}
+
+.chip {
+  appearance: none;
+  border: none;
+  cursor: pointer;
+  font: inherit;
+  font-weight: 700;
+  color: var(--walnut);
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 14px 24px;
+  min-height: 56px;
+  background: var(--sand);
+  border-radius: var(--r-pill);
+  box-shadow: var(--shadow-soft);
+  transition: transform .12s var(--ease-squish);
+}
+.chip:active { transform: translateY(4px); box-shadow: 0 0 0 var(--sand-deep); }
+.chip[aria-pressed="false"] { opacity: .55; }
+.chip__icon { font-size: 22px; }
+
+/* ---------- Game topbar ---------- */
+.topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: clamp(16px, 4vw, 24px);
+}
+.topbar__title {
+  font-size: clamp(22px, 6vw, 30px);
+  font-weight: 600;
+  margin: 0;
+}
+.round-btn {
+  appearance: none;
+  border: none;
+  cursor: pointer;
+  width: var(--tap);
+  height: var(--tap);
+  flex: 0 0 var(--tap);
+  border-radius: var(--r-md);
+  background: var(--sun);
+  color: var(--walnut);
+  font-size: 34px;
+  font-weight: 700;
+  display: grid;
+  place-items: center;
+  box-shadow: var(--shadow-walnut);
+  transition: transform .12s var(--ease-squish), box-shadow .12s ease;
+}
+.round-btn:active { transform: translateY(var(--edge)); box-shadow: 0 0 0 var(--walnut); }
+.round-btn--ghost { background: transparent; box-shadow: none; pointer-events: none; }
+
+/* ---------- Stage ---------- */
+.stage {
+  position: relative;
+  flex: 1 1 auto;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  width: min(900px, 100%);
+  margin: 0 auto;
+  padding: 0 clamp(16px, 4vw, 28px) clamp(16px, 3vh, 32px);
+  overflow: hidden;
+}
+
+.prompt {
+  flex: 0 0 auto;
+  text-align: center;
+  font-family: "Fredoka", sans-serif;
+  font-weight: 500;
+  font-size: clamp(18px, 3.4vh, 28px);
+  color: var(--walnut-soft);
+  margin: 0 0 clamp(10px, 2vh, 22px);
+  min-height: 1.2em;
+}
+
+/* Generic big play tile used by several games */
+.tile {
+  appearance: none;
+  border: none;
+  cursor: pointer;
+  font: inherit;
+  color: var(--walnut);
+  border-radius: var(--r-lg);
+  box-shadow: var(--shadow-walnut);
+  display: grid;
+  place-items: center;
+  transition: transform .14s var(--ease-squish), box-shadow .14s ease;
+}
+.tile:active { transform: translateY(var(--edge)) scale(.97); box-shadow: 0 0 0 var(--walnut); }
+
+.pop-in { animation: popIn .4s var(--ease-squish) both; }
+@keyframes popIn {
+  from { transform: scale(.4); opacity: 0; }
+  to   { transform: scale(1);  opacity: 1; }
+}
+
+.bounce { animation: bounce .5s var(--ease-squish); }
+@keyframes bounce {
+  0%   { transform: scale(1); }
+  35%  { transform: scale(1.18) rotate(-3deg); }
+  70%  { transform: scale(.94) rotate(2deg); }
+  100% { transform: scale(1); }
+}
+
+.wiggle { animation: wiggle .4s ease; }
+@keyframes wiggle {
+  0%,100% { transform: translateX(0); }
+  25% { transform: translateX(-8px); }
+  75% { transform: translateX(8px); }
+}
+
+/* ---------- FX layer (confetti) ---------- */
+.fx { position: fixed; inset: 0; pointer-events: none; z-index: 50; overflow: hidden; }
+.confetti {
+  position: absolute;
+  width: 14px; height: 14px;
+  border-radius: 4px;
+  will-change: transform, opacity;
+}
+
+/* ---------- Reduced motion ---------- */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: .001ms !important;
+    transition-duration: .05ms !important;
+  }
+}
