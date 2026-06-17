@@ -21,7 +21,10 @@
 
     setEnabled(v) {
       this.on = v;
-      if (!v) window.speechSynthesis && window.speechSynthesis.cancel();
+      if (!v) {
+        this._queued = 0;
+        window.speechSynthesis && window.speechSynthesis.cancel();
+      }
     },
 
     /* A single soft sine/triangle "blip" with a gentle envelope. */
@@ -70,6 +73,47 @@
     nope()   { this.tone(196, { dur: 0.22, type: "sine", gain: 0.14 });
                this.tone(174.6, { dur: 0.26, type: "sine", gain: 0.12, when: 0.12 }); },
 
+    /* A gentle two-tone firetruck siren. */
+    siren() {
+      if (!this.on) return;
+      const a = this.ctx();
+      if (!a) return;
+      const t = a.currentTime;
+      const o = a.createOscillator();
+      const g = a.createGain();
+      o.type = "sine";
+      o.connect(g).connect(a.destination);
+      g.gain.setValueAtTime(0.16, t);
+      o.frequency.setValueAtTime(660, t);
+      o.frequency.linearRampToValueAtTime(990, t + 0.25);
+      o.frequency.linearRampToValueAtTime(660, t + 0.5);
+      o.frequency.linearRampToValueAtTime(990, t + 0.75);
+      g.gain.linearRampToValueAtTime(0, t + 0.95);
+      o.start(t);
+      o.stop(t + 0.95);
+    },
+
+    /* A soft "whoosh" of water spray (filtered white noise). */
+    spray() {
+      if (!this.on) return;
+      const a = this.ctx();
+      if (!a) return;
+      const t = a.currentTime;
+      const buf = a.createBuffer(1, (a.sampleRate * 0.4) | 0, a.sampleRate);
+      const d = buf.getChannelData(0);
+      for (let i = 0; i < d.length; i++) d[i] = (Math.random() * 2 - 1) * (1 - i / d.length);
+      const s = a.createBufferSource();
+      s.buffer = buf;
+      const f = a.createBiquadFilter();
+      f.type = "highpass";
+      f.frequency.value = 600;
+      const g = a.createGain();
+      g.gain.setValueAtTime(0.22, t);
+      g.gain.linearRampToValueAtTime(0, t + 0.4);
+      s.connect(f).connect(g).connect(a.destination);
+      s.start(t);
+    },
+
     /* ---- Voice selection ------------------------------------------------ */
     _voice: null,
 
@@ -104,13 +148,21 @@
       return this._voice;
     },
 
+    /* How many of our utterances are still queued/playing. We let speech
+       finish naturally (never call cancel mid-word), so nothing is ever cut
+       off. To avoid a runaway backlog from rapid taps, we simply skip a new
+       line once a couple are already waiting — dropping is silent, it never
+       interrupts what's already being said. */
+    _queued: 0,
+
     /* Speak a short word/number warmly. `cheer:true` makes it bright and
        excited for celebrations. A little pitch jitter keeps it lively
        instead of robotic and repetitive. */
     say(text, { rate, pitch, cheer = false, jitter = true } = {}) {
       if (!this.on || !("speechSynthesis" in window)) return;
+      // Don't pile up: keep at most one playing + one waiting.
+      if (this._queued >= 2) return;
       try {
-        window.speechSynthesis.cancel();
         const u = new SpeechSynthesisUtterance(String(text));
         const v = this._ensureVoice();
         if (v) u.voice = v;
@@ -125,6 +177,21 @@
         u.rate = Math.max(0.6, Math.min(1.4, r));
         u.pitch = Math.max(0.5, Math.min(2, p));
         u.volume = 1;
+
+        // Release the slot exactly once, whichever fires first. The watchdog
+        // covers the Chrome bug where onend never fires and would otherwise
+        // wedge the queue shut forever.
+        let settled = false;
+        const settle = () => {
+          if (settled) return;
+          settled = true;
+          this._queued = Math.max(0, this._queued - 1);
+        };
+        u.onend = settle;
+        u.onerror = settle;
+        this._queued++;
+        setTimeout(settle, 1600 + String(text).length * 120);
+
         window.speechSynthesis.speak(u);
       } catch (e) { /* ignore */ }
     },
