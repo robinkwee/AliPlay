@@ -1,6 +1,7 @@
 /* ============================================================
    POP! — Bubbles drift up from the bottom; tap to pop them.
-   Endless and calm. No fail state, just satisfying pops.
+   Calm, no fail state — just satisfying pops. The session ends
+   gently once Ali has popped GOAL bubbles, then celebrates.
    ============================================================ */
 (function () {
   const PALETTE = [
@@ -8,12 +9,14 @@
     "#9CB7D4", "#C9A1C7",
   ];
   const FACES = ["", "", "", "⭐", "💛", "🌸"]; // some bubbles carry a treat
+  const GOAL = 15; // pop this many, then "All done!"
 
-  let field, timer, bubbles, raf, lastSpawn, scoreEl, score;
+  let field, bubbles, raf, lastSpawn, scoreEl, score, stageEl, finished;
 
   function rnd(a, b) { return a + Math.random() * (b - a); }
 
   function spawn() {
+    if (finished) return;
     const size = rnd(78, 130);
     const b = document.createElement("button");
     b.className = "bubble";
@@ -39,14 +42,28 @@
   }
 
   function pop(b) {
-    if (b._popped) return;
+    if (b._popped || finished) return;
     b._popped = true;
     Sound.pop();
     FX.burstAt(b, 14);
     score++;
-    scoreEl.textContent = "🫧 " + score;
+    scoreEl.textContent = "🫧 " + score + " / " + GOAL;
     b.classList.add("bubble--pop");
     setTimeout(() => remove(b), 220);
+    if (score >= GOAL) end();
+  }
+
+  function end() {
+    finished = true;
+    cancelAnimationFrame(raf);
+    raf = null;
+    // Let the last pop's confetti settle, then show the finish card.
+    setTimeout(() => {
+      Session.finish(stageEl, {
+        message: "You popped them all, Ali! 🫧",
+        onAgain: () => play(stageEl),
+      });
+    }, 650);
   }
 
   function remove(b) {
@@ -56,6 +73,7 @@
   }
 
   function loop(ts) {
+    if (finished) return;
     if (!lastSpawn) lastSpawn = ts;
     if (ts - lastSpawn > 900 && bubbles.length < 8) {
       spawn();
@@ -64,22 +82,27 @@
     raf = requestAnimationFrame(loop);
   }
 
+  function play(stage) {
+    stageEl = stage;
+    score = 0;
+    bubbles = [];
+    lastSpawn = 0;
+    finished = false;
+    stage.innerHTML =
+      '<p class="prompt" id="pop-score">🫧 0 / ' + GOAL + '</p>' +
+      '<div class="bubble-field" id="bubble-field"></div>';
+    field = document.getElementById("bubble-field");
+    scoreEl = document.getElementById("pop-score");
+    for (let i = 0; i < 4; i++) setTimeout(spawn, i * 500);
+    raf = requestAnimationFrame(loop);
+  }
+
   window.Games = window.Games || {};
   window.Games.pop = {
     title: "Pop!",
-    mount(stage) {
-      score = 0;
-      bubbles = [];
-      lastSpawn = 0;
-      stage.innerHTML =
-        '<p class="prompt" id="pop-score">🫧 0</p>' +
-        '<div class="bubble-field" id="bubble-field"></div>';
-      field = document.getElementById("bubble-field");
-      scoreEl = document.getElementById("pop-score");
-      for (let i = 0; i < 4; i++) setTimeout(spawn, i * 500);
-      raf = requestAnimationFrame(loop);
-    },
+    mount(stage) { play(stage); },
     unmount() {
+      finished = true;
       cancelAnimationFrame(raf);
       raf = null;
       bubbles = [];

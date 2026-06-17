@@ -32,7 +32,8 @@
     return a;
   }
 
-  let target;
+  const GOAL = 5; // correct matches, then "All done!"
+  let target, stageEl, found;
 
   function round() {
     const choices = shuffle(SHAPES).slice(0, 4);
@@ -61,7 +62,15 @@
       Sound.praise(NAMES[sh] + "!");
       FX.burstAt(btn, 18);
       btn.classList.add("bounce");
-      setTimeout(round, 1100);
+      found++;
+      if (found >= GOAL) {
+        setTimeout(() => Session.finish(stageEl, {
+          message: "You found them all, Ali! 🔺",
+          onAgain: () => play(stageEl),
+        }), 1100);
+      } else {
+        setTimeout(round, 1100);
+      }
     } else {
       Sound.nope();
       btn.classList.remove("wiggle");
@@ -70,15 +79,19 @@
     }
   }
 
+  function play(stage) {
+    stageEl = stage;
+    found = 0;
+    stage.innerHTML =
+      '<p class="prompt" id="shape-label">Find a shape!</p>' +
+      '<div class="shape-tray" id="shape-tray"></div>';
+    round();
+  }
+
   window.Games = window.Games || {};
   window.Games.shapes = {
     title: "Shapes",
-    mount(stage) {
-      stage.innerHTML =
-        '<p class="prompt" id="shape-label">Find a shape!</p>' +
-        '<div class="shape-tray" id="shape-tray"></div>';
-      round();
-    },
+    mount(stage) { play(stage); },
     unmount() {},
   };
 })();

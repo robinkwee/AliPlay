@@ -5,7 +5,8 @@
    ============================================================ */
 (function () {
   const FRUITS = ["🍎", "🍌", "🍓", "🍊", "🍐", "🍇", "🥕", "🍋"];
-  let count, tapped, fruit;
+  const GOAL = 4; // baskets, then "All done!"
+  let count, tapped, fruit, stageEl, baskets;
 
   function round() {
     count = 1 + ((Math.random() * 5) | 0); // 1..5, gentle range
@@ -46,26 +47,38 @@
     updateTally();
 
     if (tapped === count) {
+      baskets++;
       setTimeout(() => {
         Sound.yay();
         Sound.praise("That's " + count + "!");
         FX.rain(40);
         document.getElementById("count-label").textContent = "🎉 " + count + "! Hooray!";
       }, 350);
-      setTimeout(round, 1900);
+      if (baskets >= GOAL) {
+        setTimeout(() => Session.finish(stageEl, {
+          message: "Great counting, Ali! 🍎",
+          onAgain: () => play(stageEl),
+        }), 1900);
+      } else {
+        setTimeout(round, 1900);
+      }
     }
+  }
+
+  function play(stage) {
+    stageEl = stage;
+    baskets = 0;
+    stage.innerHTML =
+      '<p class="prompt" id="count-label">Tap each one and count!</p>' +
+      '<div class="count-tray" id="count-tray"></div>' +
+      '<p class="prompt count-tally" id="count-tally"></p>';
+    round();
   }
 
   window.Games = window.Games || {};
   window.Games.counting = {
     title: "Counting",
-    mount(stage) {
-      stage.innerHTML =
-        '<p class="prompt" id="count-label">Tap each one and count!</p>' +
-        '<div class="count-tray" id="count-tray"></div>' +
-        '<p class="prompt count-tally" id="count-tally"></p>';
-      round();
-    },
+    mount(stage) { play(stage); },
     unmount() {},
   };
 })();

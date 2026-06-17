@@ -13,7 +13,8 @@
     { name: "Brown",  hex: "#C98B6B" },
   ];
 
-  let stageEl, target, target2;
+  const GOAL = 5; // correct matches, then "All done!"
+  let stageEl, target, found;
 
   function shuffle(a) {
     a = a.slice();
@@ -57,7 +58,15 @@
       Sound.praise(c.name + "!");
       FX.burstAt(blob, 18);
       blob.classList.add("bounce");
-      setTimeout(pickRound, 1100);
+      found++;
+      if (found >= GOAL) {
+        setTimeout(() => Session.finish(stageEl, {
+          message: "You found them all, Ali! 🎨",
+          onAgain: () => play(stageEl),
+        }), 1100);
+      } else {
+        setTimeout(pickRound, 1100);
+      }
     } else {
       Sound.nope();
       blob.classList.remove("wiggle");
@@ -66,17 +75,20 @@
     }
   }
 
+  function play(stage) {
+    stageEl = stage;
+    found = 0;
+    stage.innerHTML =
+      '<p class="prompt" id="color-label">Find a color!</p>' +
+      '<div class="color-target-wrap"><div class="color-target" id="color-target"></div></div>' +
+      '<div class="color-tray" id="color-tray"></div>';
+    pickRound();
+  }
+
   window.Games = window.Games || {};
   window.Games.colors = {
     title: "Colors",
-    mount(stage) {
-      stageEl = stage;
-      stage.innerHTML =
-        '<p class="prompt" id="color-label">Find a color!</p>' +
-        '<div class="color-target-wrap"><div class="color-target" id="color-target"></div></div>' +
-        '<div class="color-tray" id="color-tray"></div>';
-      pickRound();
-    },
+    mount(stage) { play(stage); },
     unmount() {},
   };
 })();
