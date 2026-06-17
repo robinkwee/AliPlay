@@ -1,8 +1,11 @@
 /* ============================================================
    ANIMAL FRIENDS — a calm grid of animals. Tap one and it
    bounces, sparkles, and says its name + sound out loud.
+   A free-play toy, so it ends on a gentle timer rather than a
+   score: after PLAY_MS it winds down to "All done!".
    ============================================================ */
 (function () {
+  const PLAY_MS = 150000; // ~2.5 minutes of calm free play
   const ANIMALS = [
     { emoji: "🐮", name: "Cow",   says: "Moooo",     note: 261.6 },
     { emoji: "🐱", name: "Cat",   says: "Meow",      note: 392.0 },
@@ -24,27 +27,33 @@
     btn.classList.add("bounce");
   }
 
+  function play(stage) {
+    stage.innerHTML =
+      '<p class="prompt">Tap a friend to say hello!</p>' +
+      '<div class="petgrid" id="petgrid"></div>';
+    const grid = document.getElementById("petgrid");
+    ANIMALS.forEach((a, i) => {
+      const btn = document.createElement("button");
+      btn.className = "tile animal pop-in";
+      btn.style.animationDelay = (i * 60) + "ms";
+      btn.style.background = "var(--sand)";
+      btn.innerHTML =
+        '<span class="animal__emoji" aria-hidden="true">' + a.emoji + "</span>" +
+        '<span class="animal__name">' + a.name + "</span>";
+      btn.setAttribute("aria-label", a.name);
+      btn.addEventListener("pointerdown", (e) => { e.preventDefault(); tap(btn, a); });
+      grid.appendChild(btn);
+    });
+    Session.countdown(PLAY_MS, () => Session.finish(stage, {
+      message: "What lovely friends, Ali! 🐮",
+      onAgain: () => play(stage),
+    }));
+  }
+
   window.Games = window.Games || {};
   window.Games.animals = {
     title: "Animals",
-    mount(stage) {
-      stage.innerHTML =
-        '<p class="prompt">Tap a friend to say hello!</p>' +
-        '<div class="petgrid" id="petgrid"></div>';
-      const grid = document.getElementById("petgrid");
-      ANIMALS.forEach((a, i) => {
-        const btn = document.createElement("button");
-        btn.className = "tile animal pop-in";
-        btn.style.animationDelay = (i * 60) + "ms";
-        btn.style.background = "var(--sand)";
-        btn.innerHTML =
-          '<span class="animal__emoji" aria-hidden="true">' + a.emoji + "</span>" +
-          '<span class="animal__name">' + a.name + "</span>";
-        btn.setAttribute("aria-label", a.name);
-        btn.addEventListener("pointerdown", (e) => { e.preventDefault(); tap(btn, a); });
-        grid.appendChild(btn);
-      });
-    },
-    unmount() {},
+    mount(stage) { play(stage); },
+    unmount() { Session.clear(); },
   };
 })();

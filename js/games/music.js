@@ -2,8 +2,10 @@
    MUSIC — a row of big, chubby keys. Each plays a warm note and
    lights up when pressed. A pentatonic scale so any combination
    sounds pleasant (no "wrong" notes for little fingers).
+   A free-play toy, so it winds down to "All done!" after PLAY_MS.
    ============================================================ */
 (function () {
+  const PLAY_MS = 150000; // ~2.5 minutes of calm free play
   // C-major pentatonic across an octave-and-a-bit: always harmonious.
   const KEYS = [
     { note: "C", freq: 261.63, color: "var(--rust)" },
@@ -23,25 +25,31 @@
     FX.burstAt(key, 8);
   }
 
+  function play(stage) {
+    stage.innerHTML =
+      '<p class="prompt">Tap the keys to make a song! 🎵</p>' +
+      '<div class="keyboard" id="keyboard"></div>';
+    const kb = document.getElementById("keyboard");
+    KEYS.forEach((k, i) => {
+      const key = document.createElement("button");
+      key.className = "tile key pop-in";
+      key.style.animationDelay = (i * 60) + "ms";
+      key.style.background = k.color;
+      key.innerHTML = '<span class="key__dot" aria-hidden="true"></span>';
+      key.setAttribute("aria-label", "note " + k.note);
+      key.addEventListener("pointerdown", (e) => { e.preventDefault(); press(key, k); });
+      kb.appendChild(key);
+    });
+    Session.countdown(PLAY_MS, () => Session.finish(stage, {
+      message: "What a lovely song, Ali! 🎵",
+      onAgain: () => play(stage),
+    }));
+  }
+
   window.Games = window.Games || {};
   window.Games.music = {
     title: "Music",
-    mount(stage) {
-      stage.innerHTML =
-        '<p class="prompt">Tap the keys to make a song! 🎵</p>' +
-        '<div class="keyboard" id="keyboard"></div>';
-      const kb = document.getElementById("keyboard");
-      KEYS.forEach((k, i) => {
-        const key = document.createElement("button");
-        key.className = "tile key pop-in";
-        key.style.animationDelay = (i * 60) + "ms";
-        key.style.background = k.color;
-        key.innerHTML = '<span class="key__dot" aria-hidden="true"></span>';
-        key.setAttribute("aria-label", "note " + k.note);
-        key.addEventListener("pointerdown", (e) => { e.preventDefault(); press(key, k); });
-        kb.appendChild(key);
-      });
-    },
-    unmount() {},
+    mount(stage) { play(stage); },
+    unmount() { Session.clear(); },
   };
 })();
